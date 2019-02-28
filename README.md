@@ -15,4 +15,4 @@ This is a small system for creating, deleting and visiting short URLs
 
 ## Exercise
 
-Open a pull request with as many functional tests as necessary to protect against software regressions
+This project works as designed but doesn't have a test suite. Open a pull request with as many automated tests as necessary to protect against regressions.
