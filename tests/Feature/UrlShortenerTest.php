@@ -46,7 +46,7 @@ class UrlShortenerTest extends TestCase
         $this->post('/api/create', ['destination'=> $valid_lorem_imsum.'a'])->assertStatus(302);
     
         //valid url
-        $response = $this->post('/api/create', ['destination'=> 'https://google.com']);
+        $response = $this->post('/api/create', ['destination'=> 'https://example.com']);
         //returns 'created'
         $response->assertStatus(201);
         //returns shortcode
@@ -59,7 +59,7 @@ class UrlShortenerTest extends TestCase
     
     public function testShortCodeDeletion()
     {
-        $shortcode = $this->post('/api/create', ['destination'=> 'https://google.com'])->getContent();
+        $shortcode = $this->post('/api/create', ['destination'=> 'https://example.com'])->getContent();
         //ensure creation was successful
         $this->assertTrue(ShortUrl::ofCode($shortcode)->exists);
         
@@ -80,12 +80,12 @@ class UrlShortenerTest extends TestCase
 
     public function testShortCodeVisiting()
     {
-        $shortcode = $this->post('/api/create', ['destination'=> 'https://google.com'])->getContent();
+        $shortcode = $this->post('/api/create', ['destination'=> 'https://example.com'])->getContent();
         
         //existing shortcode redirects to destination
         $response = $this->get("/visit/{$shortcode}");
         $response->assertStatus(302);
-        $response->assertRedirect('https://google.com');
+        $response->assertRedirect('https://example.com');
         
         //fake-ish shortcode returns 'not found'
         $response = $this->get('/visit/'.$this->getFakeShortcode())->assertNotFound();
