@@ -93,6 +93,8 @@ class UrlShortenerTest extends TestCase
     
     protected function getFakeShortcode()
     {
+        //make sure at least one entry exists
+        ShortUrl::create(['destination' => 'https://example.com']);
         //get max id
         $short_url = ShortUrl::orderBy('id', 'desc')->first();
         //iterate id by one so that we have an id that could be real, but isn't
