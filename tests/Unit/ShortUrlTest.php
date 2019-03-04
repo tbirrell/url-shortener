@@ -18,6 +18,7 @@ class ShortUrlTest extends TestCase
         //ensure shortcode generates properly
         $this->assertIsString($short_url->code);
     }
+    
     public function testCodeAttribute()
     {
         $short_url = (new ShortUrl());

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\ShortUrl;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,14 +12,19 @@ class UrlShortenerTest extends TestCase
 {
     public function testBasicWebRoutes()
     {
+        //route exists
+        $this->assertTrue(Route::has('short-url.click'));
+        
         //get without shortcode returns 'not found'
         $this->get('/visit/')->assertNotFound();
-        //get with bad shortcode returns 'not found'
-        $this->get('/visit/notarealshortcode')->assertNotFound();
     }
     
     public function testBasicApiRoutes()
     {
+        //routes exist
+        $this->assertTrue(Route::has('short-url.store'));
+        $this->assertTrue(Route::has('short-url.destroy'));
+        
         //post without data redirects back
         $this->post('/api/create')->assertStatus(302);
         //delete without shortcode returns 'not found'
@@ -54,7 +60,6 @@ class UrlShortenerTest extends TestCase
         $this->assertIsString($shortcode);
         //actually exists
         $this->assertTrue(ShortUrl::ofCode($shortcode)->exists);
-        
     }
     
     public function testShortCodeDeletion()
@@ -74,21 +79,23 @@ class UrlShortenerTest extends TestCase
         $this->delete('/api/delete/notarealshortcode')->assertStatus(204);
         //deleting fake-ish shortcode returns 'no content'
         $this->delete('/api/delete/'.$this->getFakeShortcode())->assertStatus(204);
-        
-        //
     }
 
     public function testShortCodeVisiting()
     {
-        $shortcode = $this->post('/api/create', ['destination'=> 'https://example.com'])->getContent();
+        //get with bad shortcode returns 'not found'
+        $this->get('/visit/notarealshortcode')->assertNotFound();
+        
+        $url = 'https://example.com';
+        $shortcode = $this->post('/api/create', ['destination'=> $url])->getContent();
         
         //existing shortcode redirects to destination
         $response = $this->get("/visit/{$shortcode}");
         $response->assertStatus(302);
-        $response->assertRedirect('https://example.com');
+        $response->assertRedirect($url);
         
         //fake-ish shortcode returns 'not found'
-        $response = $this->get('/visit/'.$this->getFakeShortcode())->assertNotFound();
+        $this->get('/visit/'.$this->getFakeShortcode())->assertNotFound();
     }
     
     protected function getFakeShortcode()
